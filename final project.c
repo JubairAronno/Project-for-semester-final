@@ -160,14 +160,12 @@ void printStudents(struct Student *head) {
     while (head != NULL) {
         printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollNumber, head->name, head->cgpa, head->gender);
         head = head->next;
-    }
 }
-
-
+}
 void freeList(struct Student *head) {
-    while (head != NULL) {
-        struct Student *temp = head;
-        head = head->next;
-        free(temp);
-    }
+while (head != NULL) {
+struct Student *temp = head;
+head = head->next;
+free(temp);
+}
 }
