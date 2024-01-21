@@ -144,3 +144,30 @@ void updateStudent(struct Student *head, int rollNumber) {
         head = head->next;   }
     printf("Student with roll number %d not found.\n", rollNumber);
 }
+void determineWaiver(struct Student *head) {
+    while (head != NULL) {
+        printf("Student %s is %s for waiver.\n", head->name, (head->cgpa > 4.0) ? "eligible" : "not eligible");
+        head = head->next;
+    }
+}
+void printGenderCounts() {
+printf("\nCount of Students:\n");
+printf("Boys: %d\n", boysCount);
+printf("Girls: %d\n", girlsCount);
+}
+void printStudents(struct Student *head) {
+    printf("\nList of Students:\n");
+    while (head != NULL) {
+        printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollNumber, head->name, head->cgpa, head->gender);
+        head = head->next;
+    }
+}
+
+
+void freeList(struct Student *head) {
+    while (head != NULL) {
+        struct Student *temp = head;
+        head = head->next;
+        free(temp);
+    }
+}
