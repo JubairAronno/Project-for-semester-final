@@ -169,3 +169,9 @@ head = head->next;
 free(temp);
 }
 }
+int main()
+{
+    struct student *head=NULL;
+    int rollNuber,choice;
+    char name[45],firstName[50], gender;
+}
