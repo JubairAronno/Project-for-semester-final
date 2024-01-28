@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +22,22 @@ void addStudent(struct student** head, int rollnumber, const char* name, float c
         }
     }
 
+    do {
+        printf("Enter gender (M/F): ");
+        scanf(" %c", &gender);
+
+        if (gender == 'M' || gender == 'm') {
+            boycount++;
+            break;
+        } else if (gender == 'F' || gender == 'f') {
+            girlcount++;
+            break;
+        } else {
+            printf("Error: Invalid gender. Please enter 'M' for male or 'F' for female.\n");
+            printf("Please try again.\n");
+        }
+    } while (1);
+
     struct student* newstudent = (struct student*)malloc(sizeof(struct student));
 
     if (newstudent == NULL) {
@@ -33,12 +50,6 @@ void addStudent(struct student** head, int rollnumber, const char* name, float c
     newstudent->name[sizeof(newstudent->name) - 1] = '\0';
     newstudent->cgpa = cgpa;
     newstudent->gender = gender;
-
-    if (gender == 'MALE' || gender == 'male') {
-        boycount++;
-    } else if (gender == 'FEMALE' || gender == 'female') {
-        girlcount++;
-    }
 
     newstudent->next = *head;
     *head = newstudent;
@@ -173,7 +184,7 @@ void freeList(struct student* head) {
 int main() {
     struct student* head = NULL;
     int rollnumber, choice;
-    char name[45], firstName[50], gender;
+    char name[111], firstName[111], gender;
     float cgpa;
 
     do {
@@ -194,14 +205,12 @@ int main() {
         switch (choice) {
             case 1:
                 printf("Enter student data:\n");
-                printf("Roll Number: ");
-                scanf("%d", &rollnumber);
                 printf("Name: ");
                 scanf("%s", name);
+                printf("Roll Number: ");
+                scanf("%d", &rollnumber);
                 printf("CGPA: ");
                 scanf("%f", &cgpa);
-                printf("Gender (M/F): ");
-                scanf(" %c", &gender);
 
                 addStudent(&head, rollnumber, name, cgpa, gender);
                 break;
@@ -259,3 +268,4 @@ int main() {
 
     return 0;
 }
+s
