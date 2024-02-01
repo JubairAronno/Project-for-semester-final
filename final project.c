@@ -38,7 +38,11 @@ void addStudent(struct Student **head, int rollNumber, const char *name, float c
     newStudent->cgpa = cgpa;
     newStudent->gender = gender;
 
-
+    if (gender == 'M' || gender == 'm') {
+        boysCount++;
+    } else if (gender == 'F' || gender == 'f') {
+        girlsCount++;
+    }
 
     newStudent->next = *head;
     *head = newStudent;
@@ -79,9 +83,13 @@ void deleteStudent(struct Student **head, int rollNumber) {
                 prev->next = current->next;
             }
             if (current->gender == 'M' || current->gender == 'm') {
-                boysCount--;
+                if (boysCount > 0) {
+                    boysCount--;
+                }
             } else if (current->gender == 'F' || current->gender == 'f') {
-                girlsCount--;
+                if (girlsCount > 0) {
+                    girlsCount--;
+                }
             }
             free(current);
             printf("Student with roll number %d deleted successfully.\n", rollNumber);
@@ -133,7 +141,7 @@ void updateStudent(struct Student *head, int rollNumber) {
         }
         head = head->next;
     }
-    printf("Student with roll number %d not found.\n", rollNumber);
+    printf("updated  %d successfully\n", rollNumber);
 }
 
 void printGenderCounts() {
