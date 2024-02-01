@@ -1,90 +1,64 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct student {
-    int rollnumber;
-    char name[111];
+struct Student {
+    int rollNumber;
+    char name[50];
     float cgpa;
     char gender;
-    struct student* next;
+    struct Student *next;
 };
 
-int boycount = 0;
-int girlcount = 0;
+int boysCount = 0;
+int girlsCount = 0;
 
-void addStudent(struct student** head, int rollnumber, const char* name, float cgpa, char gender) {
-    for (struct student* current = *head; current != NULL; current = current->next) {
-        if (current->rollnumber == rollnumber) {
-            printf("Roll number %d already exists. Please enter another roll.\n", rollnumber);
+void addStudent(struct Student **head, int rollNumber, const char *name, float cgpa, char gender) {
+    for (struct Student *current = *head; current != NULL; current = current->next) {
+        if (current->rollNumber == rollNumber) {
+            printf("Error: Roll number %d already exists. Please enter a unique roll number.\n", rollNumber);
             return;
         }
     }
 
-    do {
-        printf("Enter gender (M/F): ");
-        scanf(" %c", &gender);
+    if (cgpa < 1 || cgpa > 4) {
+        printf("Error: CGPA should be between 1 and 4.\n");
+        return;
+    }
 
-        if (gender == 'M' || gender == 'm') {
-            boycount++;
-            break;
-        } else if (gender == 'F' || gender == 'f') {
-            girlcount++;
-            break;
-        } else {
-            printf("Error: Invalid gender. Please enter 'M' for male or 'F' for female.\n");
-            printf("Please try again.\n");
-        }
-    } while (1);
-
-    struct student* newstudent = (struct student*)malloc(sizeof(struct student));
-
-    if (newstudent == NULL) {
+    struct Student *newStudent = (struct Student *)malloc(sizeof(struct Student));
+    if (newStudent == NULL) {
         printf("Memory allocation failed.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
-    newstudent->rollnumber = rollnumber;
-    strncpy(newstudent->name, name, sizeof(newstudent->name) - 1);
-    newstudent->name[sizeof(newstudent->name) - 1] = '\0';
-    newstudent->cgpa = cgpa;
-    newstudent->gender = gender;
+    newStudent->rollNumber = rollNumber;
+    strncpy(newStudent->name, name, sizeof(newStudent->name) - 1);
+    newStudent->name[sizeof(newStudent->name) - 1] = '\0';
+    newStudent->cgpa = cgpa;
+    newStudent->gender = gender;
 
-    newstudent->next = *head;
-    *head = newstudent;
 
-    printf("Student added.\n");
+
+    newStudent->next = *head;
+    *head = newStudent;
+
+    printf("Student added successfully.\n");
 }
 
-void findStudentByRollNumber(struct student* head, int rollnumber) {
+void findStudentByRollNumber(struct Student *head, int rollNumber) {
     while (head != NULL) {
-        if (head->rollnumber == rollnumber) {
+        if (head->rollNumber == rollNumber) {
             printf("\nStudent found:\n");
-            printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollnumber, head->name, head->cgpa, head->gender);
+            printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollNumber, head->name, head->cgpa, head->gender);
             return;
         }
         head = head->next;
     }
-    printf("Student with roll number %d not found.\n", rollnumber);
+    printf("Student with roll number %d not found.\n", rollNumber);
 }
 
-void findStudentsByFirstName(struct student* head, const char* firstName) {
-    printf("\nStudents with the first name %s:\n", firstName);
-    int found = 0;
-    while (head != NULL) {
-        if (strncmp(head->name, firstName, strlen(firstName)) == 0) {
-            printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollnumber, head->name, head->cgpa, head->gender);
-            found = 1;
-        }
-        head = head->next;
-    }
-    if (!found) {
-        printf("No students with the first name %s found.\n", firstName);
-    }
-}
-
-int countStudents(struct student* head) {
+int countStudents(struct Student *head) {
     int count = 0;
     while (head != NULL) {
         count++;
@@ -93,19 +67,24 @@ int countStudents(struct student* head) {
     return count;
 }
 
-void deleteStudent(struct student** head, int rollnumber) {
-    struct student* current = *head;
-    struct student* prev = NULL;
+void deleteStudent(struct Student **head, int rollNumber) {
+    struct Student *current = *head;
+    struct Student *prev = NULL;
 
     while (current != NULL) {
-        if (current->rollnumber == rollnumber) {
+        if (current->rollNumber == rollNumber) {
             if (prev == NULL) {
                 *head = current->next;
             } else {
                 prev->next = current->next;
             }
+            if (current->gender == 'M' || current->gender == 'm') {
+                boysCount--;
+            } else if (current->gender == 'F' || current->gender == 'f') {
+                girlsCount--;
+            }
             free(current);
-            printf("Student with roll number %d deleted successfully.\n", rollnumber);
+            printf("Student with roll number %d deleted successfully.\n", rollNumber);
             return;
         }
 
@@ -113,12 +92,12 @@ void deleteStudent(struct student** head, int rollnumber) {
         current = current->next;
     }
 
-    printf("Student with roll number %d not found.\n", rollnumber);
+    printf("Student with roll number %d not found.\n", rollNumber);
 }
 
-void updateStudent(struct student* head, int rollnumber) {
+void updateStudent(struct Student *head, int rollNumber) {
     while (head != NULL) {
-        if (head->rollnumber == rollnumber) {
+        if (head->rollNumber == rollNumber) {
             int choice;
             printf("\nUpdate Menu:\n");
             printf("1. Update Name\n");
@@ -126,7 +105,12 @@ void updateStudent(struct student* head, int rollnumber) {
             printf("3. Update Gender\n");
             printf("4. Exit\n");
             printf("Enter your choice: ");
-            scanf("%d", &choice);
+
+            if (scanf("%d", &choice) != 1) {
+                printf("Invalid input. Please enter a number.\n");
+                while (getchar() != '\n');
+                continue;
+            }
 
             switch (choice) {
                 case 1:
@@ -149,123 +133,144 @@ void updateStudent(struct student* head, int rollnumber) {
         }
         head = head->next;
     }
-    printf("Student with roll number %d not found.\n", rollnumber);
-}
-
-void determineWaiver(struct student* head) {
-    while (head != NULL) {
-        printf("Student %s is %s for waiver.\n", head->name, (head->cgpa > 4.0) ? "eligible" : "not eligible");
-        head = head->next;
-    }
+    printf("Student with roll number %d not found.\n", rollNumber);
 }
 
 void printGenderCounts() {
     printf("\nCount of Students:\n");
-    printf("Boys: %d\n", boycount);
-    printf("Girls: %d\n", girlcount);
+    printf("Boys: %d\n", boysCount);
+    printf("Girls: %d\n", girlsCount);
 }
 
-void printStudents(struct student* head) {
+void printStudents(struct Student *head) {
     printf("\nList of Students:\n");
     while (head != NULL) {
-        printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollnumber, head->name, head->cgpa, head->gender);
+        printf("Roll Number: %d, Name: %s, CGPA: %.2f, Gender: %c\n", head->rollNumber, head->name, head->cgpa, head->gender);
         head = head->next;
     }
 }
 
-void freeList(struct student* head) {
+void freeList(struct Student *head) {
     while (head != NULL) {
-        struct student* temp = head;
+        struct Student *temp = head;
         head = head->next;
         free(temp);
     }
 }
 
 int main() {
-    struct student* head = NULL;
-    int rollnumber, choice;
-    char name[111], firstName[111], gender;
+    struct Student *head = NULL;
+
+    int rollNumber, choice;
+    char name[50], gender;
     float cgpa;
 
     do {
         printf("\nMenu:\n");
         printf("1. Add Student\n");
         printf("2. Find Student by Roll Number\n");
-        printf("3. Find Students by First Name\n");
-        printf("4. Count of Students\n");
-        printf("5. Delete Student\n");
-        printf("6. Update Student\n");
-        printf("7. Store CGPA and check if they can get Waiver or not\n");
-        printf("8. Print Gender Counts\n");
-        printf("9. Print Students\n");
-        printf("10. Exit\n");
+        printf("3. Count of Students\n");
+        printf("4. Delete Student\n");
+        printf("5. Update Student\n");
+        printf("6. Print Gender Counts\n");
+        printf("7. Print Students\n");
+        printf("8. Exit\n");
         printf("Enter your choice: ");
-        scanf("%d", &choice);
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            while (getchar() != '\n');
+            continue;
+        }
 
         switch (choice) {
             case 1:
-                printf("Enter student data:\n");
+                do {
+                    printf("Enter student data:\n");
+                    printf("Roll Number: ");
+                    if (scanf("%d", &rollNumber) != 1 || rollNumber <= 0) {
+                        printf("Invalid input. Roll number must be a positive integer.\n");
+                        while (getchar() != '\n');
+                    } else {
+                        break;
+                    }
+                } while (1);
+
                 printf("Name: ");
                 scanf("%s", name);
-                printf("Roll Number: ");
-                scanf("%d", &rollnumber);
-                printf("CGPA: ");
-                scanf("%f", &cgpa);
+                do {
+                    printf("CGPA: ");
+                    if (scanf("%f", &cgpa) != 1 || cgpa < 0 || cgpa > 4) {
+                        printf("Invalid input. CGPA should be between 0 and 4.\n");
+                        while (getchar() != '\n');
+                    } else {
+                        break;
+                    }
+                } while (1);
 
-                addStudent(&head, rollnumber, name, cgpa, gender);
+                do {
+                    printf("Gender (M/F): ");
+                    scanf(" %c", &gender);
+                    if (gender != 'M' && gender != 'm' && gender != 'F' && gender != 'f') {
+                        printf("Invalid input. Gender should be 'M' or 'F'.\n");
+                        while (getchar() != '\n');
+                    } else {
+                        break;
+                    }
+                } while (1);
+
+                addStudent(&head, rollNumber, name, cgpa, gender);
                 break;
 
             case 2:
                 printf("Enter roll number to find: ");
-                scanf("%d", &rollnumber);
-                findStudentByRollNumber(head, rollnumber);
+                if (scanf("%d", &rollNumber) != 1 || rollNumber <= 0) {
+                    printf("Invalid input. Roll number must be a positive integer.\n");
+                    break;
+                }
+                findStudentByRollNumber(head, rollNumber);
                 break;
 
             case 3:
-                printf("Enter first name to find: ");
-                scanf("%s", firstName);
-                findStudentsByFirstName(head, firstName);
-                break;
-
-            case 4:
                 printf("Total number of students: %d\n", countStudents(head));
                 break;
 
-            case 5:
+            case 4:
                 printf("Enter roll number to delete: ");
-                scanf("%d", &rollnumber);
-                deleteStudent(&head, rollnumber);
+                if (scanf("%d", &rollNumber) != 1 || rollNumber <= 0) {
+                    printf("Invalid input. Roll number must be a positive integer.\n");
+                    break;
+                }
+                deleteStudent(&head, rollNumber);
+                break;
+
+            case 5:
+                printf("Enter roll number to update: ");
+                if (scanf("%d", &rollNumber) != 1 || rollNumber <= 0) {
+                    printf("Invalid input. Roll number must be a positive integer.\n");
+                    break;
+                }
+                updateStudent(head, rollNumber);
                 break;
 
             case 6:
-                printf("Enter roll number to update: ");
-                scanf("%d", &rollnumber);
-                updateStudent(head, rollnumber);
-                break;
-
-            case 7:
-                determineWaiver(head);
-                break;
-
-            case 8:
                 printGenderCounts();
                 break;
 
-            case 9:
+            case 7:
                 printStudents(head);
                 break;
 
-            case 10:
+            case 8:
                 freeList(head);
                 printf("Program exited.\n");
                 return 0;
 
             default:
-                printf("Invalid choice. Please enter a valid option.\n");
+                printf("Invalid choice. Please enter a valid option (1 to 8).\n");
         }
 
-    } while (choice != 10);
+    } while (1);
 
     return 0;
 }
-
